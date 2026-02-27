@@ -3,7 +3,8 @@ process.env.PINION_API_URL = 'http://localhost:4020';
 import { PinionClient } from 'pinion-os';
 
 const client = new PinionClient({
-  privateKey: '0x0000000000000000000000000000000000000000000000000000000000000001'
+  privateKey: '0x0000000000000000000000000000000000000000000000000000000000000001',
+  apiUrl: 'http://localhost:4020'
 });
 
 let iteration = 0;

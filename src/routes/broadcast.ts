@@ -8,11 +8,11 @@ router.post('/', (req, res) => {
   const txHash = `0x${randomBytes(32).toString('hex')}`;
   const to = String(req.body?.tx?.to ?? req.body?.to ?? `0x${randomBytes(20).toString('hex')}`);
   const from = `0x${randomBytes(20).toString('hex')}`;
-  console.log('[MOCK BROADCAST] TxHash:', txHash);
 
   res.json(
     success({
       txHash,
+      hash: txHash,
       status: 'broadcasted',
       blockExplorer: `https://basescan.org/tx/${txHash}`,
       from,

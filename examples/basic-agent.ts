@@ -4,7 +4,8 @@ import { PinionClient } from 'pinion-os';
 
 async function run(): Promise<void> {
   const pinion = new PinionClient({
-    privateKey: '0x0000000000000000000000000000000000000000000000000000000000000001'
+    privateKey: '0x0000000000000000000000000000000000000000000000000000000000000001',
+    apiUrl: 'http://localhost:4020'
   });
 
   console.log('=== STEP 1: PRICE ===');

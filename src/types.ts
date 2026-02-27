@@ -23,11 +23,22 @@ export const MOCK_PAYMENT: PaymentReceipt = {
   txHash: null
 };
 
-export const success = <T>(data: T): SuccessEnvelope<T> => ({
-  data,
-  mock: true,
-  payment: MOCK_PAYMENT
-});
+export const success = <T>(data: T): SuccessEnvelope<T> => {
+  if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+    return {
+      ...(data as Record<string, unknown>),
+      data,
+      mock: true,
+      payment: MOCK_PAYMENT
+    } as SuccessEnvelope<T>;
+  }
+
+  return {
+    data,
+    mock: true,
+    payment: MOCK_PAYMENT
+  };
+};
 
 export const errorResponse = (error: string): ErrorEnvelope => ({
   error,
