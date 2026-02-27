@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { randomBytes } from 'node:crypto';
 import { fetchBinancePrice } from '../freeApis/binance';
 import { errorResponse, success } from '../types';
 
@@ -43,11 +44,13 @@ router.post('/', async (req, res) => {
         toToken: dst,
         fromAmount: amountRaw,
         toAmount: toAmount.toFixed(6),
+        outputAmount: toAmount.toFixed(6),
         minOutputAmount: minOutputAmount.toFixed(6),
         route: [{ protocol: 'Uniswap V3', percent: 100 }],
+        steps: ['price-quote', 'route-selection', 'tx-build'],
         unsignedTx: {
           to: '0xE592427A0AEce92De3Edee1F18E0157C05861564',
-          data: '0xmockdata',
+          data: `0x${randomBytes(32).toString('hex')}`,
           gasLimit: '250000'
         },
         priceImpact: '0.1%',

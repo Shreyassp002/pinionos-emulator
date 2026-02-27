@@ -10,11 +10,13 @@ function wrapResult(result: unknown): { content: Array<{ type: 'text'; text: str
 }
 
 async function get(path: string): Promise<unknown> {
-  return (await axios.get(`${API}${path}`)).data;
+  const envelope = (await axios.get(`${API}${path}`)).data as { data?: unknown };
+  return envelope.data ?? envelope;
 }
 
 async function post(path: string, body: Record<string, unknown>): Promise<unknown> {
-  return (await axios.post(`${API}${path}`, body)).data;
+  const envelope = (await axios.post(`${API}${path}`, body)).data as { data?: unknown };
+  return envelope.data ?? envelope;
 }
 
 async function main(): Promise<void> {
@@ -22,35 +24,36 @@ async function main(): Promise<void> {
     name: 'pinion-emulator',
     version: '0.1.0'
   });
+  const registerTool = (server.tool as unknown as (...args: unknown[]) => unknown).bind(server);
 
-  server.tool('pinion_price', { token: z.string() }, async ({ token }) =>
+  registerTool('pinion_price', { token: z.string() }, async ({ token }: { token: string }) =>
     wrapResult(await get(`/price/${token}`))
   );
-  server.tool('pinion_balance', { address: z.string() }, async ({ address }) =>
+  registerTool('pinion_balance', { address: z.string() }, async ({ address }: { address: string }) =>
     wrapResult(await get(`/balance/${address}`))
   );
-  server.tool('pinion_wallet', {}, async () => wrapResult(await get('/wallet')));
-  server.tool('pinion_tx', { hash: z.string() }, async ({ hash }) =>
+  registerTool('pinion_wallet', {}, async () => wrapResult(await get('/wallet')));
+  registerTool('pinion_tx', { hash: z.string() }, async ({ hash }: { hash: string }) =>
     wrapResult(await get(`/tx/${hash}`))
   );
-  server.tool('pinion_chat', { message: z.string() }, async ({ message }) =>
+  registerTool('pinion_chat', { message: z.string() }, async ({ message }: { message: string }) =>
     wrapResult(await post('/chat', { message }))
   );
-  server.tool(
+  registerTool(
     'pinion_send',
     { to: z.string(), amount: z.string(), token: z.string() },
-    async (args) => wrapResult(await post('/send', args))
+    async (args: { to: string; amount: string; token: string }) => wrapResult(await post('/send', args))
   );
-  server.tool(
+  registerTool(
     'pinion_trade',
     { src: z.string(), dst: z.string(), amount: z.string() },
-    async (args) => wrapResult(await post('/trade', args))
+    async (args: { src: string; dst: string; amount: string }) => wrapResult(await post('/trade', args))
   );
-  server.tool('pinion_fund', { address: z.string() }, async ({ address }) =>
+  registerTool('pinion_fund', { address: z.string() }, async ({ address }: { address: string }) =>
     wrapResult(await get(`/fund/${address}`))
   );
-  server.tool('pinion_broadcast', {}, async () => wrapResult(await post('/broadcast', {})));
-  server.tool('pinion_unlimited', {}, async () => wrapResult(await get('/unlimited')));
+  registerTool('pinion_broadcast', {}, async () => wrapResult(await post('/broadcast', {})));
+  registerTool('pinion_unlimited', {}, async () => wrapResult(await get('/unlimited')));
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
