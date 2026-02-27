@@ -1,14 +1,19 @@
 {
-  "name": "pinionos-emulator",
+  "name": "pinion-emulator",
   "version": "0.1.0",
   "description": "Local PinionOS emulator for free agent development",
   "main": "dist/emulator.js",
+  "bin": {
+    "pinion-emulator": "dist/cli.js"
+  },
   "license": "MIT",
   "scripts": {
     "start": "ts-node src/emulator.ts",
     "dev": "ts-node --watch src/emulator.ts",
     "build": "tsc -p tsconfig.json",
+    "build:examples": "tsc -p tsconfig.examples.json",
     "mcp": "ts-node src/mcp/server.ts",
+    "cli": "ts-node src/cli.ts",
     "test": "echo \"No tests yet\""
   },
   "dependencies": {

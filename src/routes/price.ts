@@ -1,17 +1,10 @@
 import { Router } from 'express';
 import { fetchBinancePrice } from '../freeApis/binance';
 import { fetchCoinGeckoPrice } from '../freeApis/coingecko';
-import { getPriceRule } from '../config';
+import { getFallbackPrice, getPriceRule } from '../config';
 import { errorResponse, success } from '../types';
 
 const router = Router();
-const staticFallback: Record<string, string> = {
-  ETH: '3000.00',
-  BTC: '90000.00',
-  SOL: '180.00',
-  MATIC: '1.10',
-  USDC: '1.00'
-};
 
 router.get('/:token', async (req, res) => {
   const token = String(req.params.token || '').toUpperCase();
@@ -42,8 +35,9 @@ router.get('/:token', async (req, res) => {
     // fall through to final static fallback
   }
 
-  if (staticFallback[token]) {
-    res.json(success({ token, usd: staticFallback[token], source: 'fallback' }));
+  const fallbackPrice = getFallbackPrice(token);
+  if (fallbackPrice !== null) {
+    res.json(success({ token, usd: fallbackPrice.toFixed(2), source: 'config-fallback' }));
     return;
   }
 

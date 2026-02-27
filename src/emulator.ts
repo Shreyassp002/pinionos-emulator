@@ -12,6 +12,7 @@ import tradeRouter from './routes/trade';
 import txRouter from './routes/tx';
 import unlimitedRouter from './routes/unlimited';
 import walletRouter from './routes/wallet';
+import { errorResponse } from './types';
 
 const app = express();
 const config = loadConfig();
@@ -39,8 +40,23 @@ app.use('/chat', chatRouter);
 app.use('/unlimited', unlimitedRouter);
 app.use('/broadcast', broadcastRouter);
 
+app.use((err: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (res.headersSent) {
+    next(err);
+    return;
+  }
+
+  if (err instanceof SyntaxError) {
+    res.status(400).json(errorResponse('invalid json body'));
+    return;
+  }
+
+  console.error('[EMULATOR ERROR]', err);
+  res.status(500).json(errorResponse('internal emulator error'));
+});
+
 app.use((_req, res) => {
-  res.status(404).json({ error: 'route not found', mock: true });
+  res.status(404).json(errorResponse('route not found'));
 });
 
 app.listen(config.port, () => {

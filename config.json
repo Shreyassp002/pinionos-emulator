@@ -8,6 +8,13 @@
     "USDC": 1,
     "MATIC": "useApi:coingecko"
   },
+  "fallbackPrices": {
+    "ETH": 3000,
+    "BTC": 90000,
+    "SOL": 180,
+    "USDC": 1,
+    "MATIC": 1.1
+  },
   "balances": {
     "default": {
       "ETH": "1.5",

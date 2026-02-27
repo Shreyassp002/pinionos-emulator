@@ -10,6 +10,7 @@ export interface Config {
   port: number;
   mockPayments: boolean;
   prices: Record<string, number | string>;
+  fallbackPrices?: Record<string, number | string>;
   balances: Record<string, AddressBalance>;
 }
 
@@ -65,4 +66,19 @@ export function getPriceRule(token: string): PriceRule {
   }
 
   return { mode: 'unset' };
+}
+
+export function getFallbackPrice(token: string): number | null {
+  const config = loadConfig();
+  const value = config.fallbackPrices?.[token.toUpperCase()];
+
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  if (typeof value === 'string' && /^\d+(\.\d+)?$/.test(value)) {
+    return Number(value);
+  }
+
+  return null;
 }

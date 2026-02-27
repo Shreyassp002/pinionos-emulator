@@ -6,7 +6,9 @@ export function paymentLogger(req: Request, _res: Response, next: NextFunction):
     return;
   }
 
-  const skill = req.path.split('/').filter(Boolean)[0] ?? 'unknown';
-  console.log(`[MOCK PAYMENT] $0.01 for skill: ${skill}`);
+  const parts = req.path.split('/').filter(Boolean);
+  const skill = parts[0] ?? 'unknown';
+  const param = parts[1] ?? '';
+  console.log(`[MOCK PAYMENT] $0.01 USDC for skill: ${skill}(${param}) - simulated, not real`);
   next();
 }
