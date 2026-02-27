@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import { loadConfig } from './config';
 import { paymentLogger } from './middleware/paymentLogger';
+import { startDashboard } from './ui/dashboard';
 import balanceRouter from './routes/balance';
 import broadcastRouter from './routes/broadcast';
 import chatRouter from './routes/chat';
@@ -14,12 +15,13 @@ import unlimitedRouter from './routes/unlimited';
 import walletRouter from './routes/wallet';
 import { errorResponse } from './types';
 
+const dashboard = startDashboard();
 const app = express();
 const config = loadConfig();
 
 app.use(cors());
 app.use(express.json());
-app.use(paymentLogger);
+app.use(paymentLogger(dashboard));
 
 app.get('/', (_req, res) => {
   res.json({ status: 'ok', emulator: true });
@@ -51,7 +53,7 @@ app.use((err: unknown, _req: express.Request, res: express.Response, next: expre
     return;
   }
 
-  console.error('[EMULATOR ERROR]', err);
+  dashboard.logError(`internal emulator error: ${String((err as Error)?.message ?? err)}`);
   res.status(500).json(errorResponse('internal emulator error'));
 });
 
@@ -60,5 +62,5 @@ app.use((_req, res) => {
 });
 
 app.listen(config.port, () => {
-  console.log(`PinionOS emulator running on http://localhost:${config.port}`);
+  dashboard.logSkillCall('SYSTEM', '', `Emulator ready on :${config.port}`);
 });
