@@ -50,6 +50,12 @@ All successful responses follow:
 }
 ```
 
+`/price/:token` resolution order:
+1. `config.prices` numeric override
+2. CoinGecko
+3. Binance
+4. `config.fallbackPrices` static fallback
+
 Errors follow:
 
 ```json
@@ -65,6 +71,8 @@ Start MCP stdio server:
 
 ```bash
 npm run mcp
+# or when installed/published:
+npx pinion-emulator mcp
 ```
 
 Claude Desktop snippet:

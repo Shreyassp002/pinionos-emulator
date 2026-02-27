@@ -7,23 +7,37 @@ const client = new PinionClient({
 });
 
 let iteration = 0;
+const MAX_ITERATIONS = 5;
+const GREEN = '\x1b[32m';
+const YELLOW = '\x1b[33m';
+const RESET = '\x1b[0m';
 
 async function runOnce(): Promise<void> {
   iteration += 1;
-  console.log('\n=== Yield Check', iteration, '===');
+  console.log(`\n${YELLOW}=== Yield Check ${iteration} ===${RESET}`);
 
-  const priceResult = await client.skills.price('ETH');
+  const priceResult = (await client.skills.price('ETH')) as unknown as {
+    data?: { usd?: string };
+  };
   const ethPrice = Number(priceResult.data?.usd ?? 0);
-  console.log('ETH Price:', ethPrice);
+  console.log(`${YELLOW}ETH Price:${RESET}`, ethPrice);
 
-  const decision = ethPrice < 3000 ? 'BUY ETH->USDC rebalance' : 'HOLD';
-  console.log('Decision:', decision);
+  const decision = ethPrice > 2000 ? 'TRADE' : 'HOLD';
+  console.log(`${YELLOW}Decision:${RESET}`, decision);
 
-  if (decision.startsWith('BUY')) {
-    const tradeResult = await client.skills.trade('ETH', 'USDC', '0.01');
-    console.log('Trade Executed:', tradeResult.data?.toAmount ?? 'n/a', 'USDC');
-    console.log('Simulated Yield: +$0.02');
+  if (decision === 'TRADE') {
+    const tradeResult = (await client.skills.trade('ETH', 'USDC', '0.01')) as unknown as {
+      data?: { toAmount?: string };
+    };
+    console.log(`${GREEN}TRADE EXECUTED${RESET}:`, tradeResult.data?.toAmount ?? 'n/a', 'USDC');
   }
+
+  const chat = (await client.skills.chat('suggest yield strategy')) as unknown as {
+    data?: { reply?: string };
+  };
+  console.log(`${YELLOW}AI:${RESET}`, chat.data?.reply ?? 'No suggestion');
+  console.log(`${GREEN}Earned:${RESET} $0.02 (custom skill fee simulated)`);
+  console.log(`${YELLOW}Summary:${RESET}`, new Date().toISOString(), `price=${ethPrice}`, `decision=${decision}`);
 }
 
 runOnce().catch((error) => {
@@ -31,8 +45,16 @@ runOnce().catch((error) => {
   process.exit(1);
 });
 
-setInterval(() => {
+const interval = setInterval(() => {
+  if (iteration >= MAX_ITERATIONS) {
+    clearInterval(interval);
+    console.log(`${GREEN}Completed ${MAX_ITERATIONS} iterations. Exiting.${RESET}`);
+    process.exit(0);
+  }
+
   runOnce().catch((error) => {
     console.error('Loop error:', error);
+    clearInterval(interval);
+    process.exit(1);
   });
 }, 10_000);
