@@ -6,7 +6,7 @@ A local TypeScript emulator for PinionOS skill APIs. Run this server to develop 
 
 ```bash
 npm install
-npm run dev
+npm start
 ```
 
 Health check:
@@ -15,10 +15,15 @@ Health check:
 curl http://localhost:4020/health
 ```
 
+`npm start` launches the terminal dashboard UI and the emulator server together.
+Press `q` or `Ctrl+C` to exit cleanly.
+
 Use with SDK override:
 
 ```ts
 process.env.PINION_API_URL = 'http://localhost:4020';
+// or pass apiUrl directly in PinionClient for guaranteed routing:
+// new PinionClient({ privateKey: '0x...', apiUrl: 'http://localhost:4020' })
 ```
 
 ## Routes
