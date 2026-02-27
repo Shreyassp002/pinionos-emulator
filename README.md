@@ -15,6 +15,12 @@ Health check:
 curl http://localhost:4020/health
 ```
 
+Use with SDK override:
+
+```ts
+process.env.PINION_API_URL = 'http://localhost:4020';
+```
+
 ## Routes
 
 - `GET /price/:token`
@@ -52,3 +58,28 @@ Errors follow:
   "mock": true
 }
 ```
+
+## MCP Mode
+
+Start MCP stdio server:
+
+```bash
+npm run mcp
+```
+
+Claude Desktop snippet:
+
+```json
+{
+  "mcpServers": {
+    "pinion-emulator": {
+      "command": "npm",
+      "args": ["run", "mcp"]
+    }
+  }
+}
+```
+
+## Fallback Client
+
+If `PINION_API_URL` override does not intercept SDK calls in your environment, use [`MockPinionClient`](/home/shreyas/code/web3/pinionos-emulator/src/client/MockPinionClient.ts) to call emulator routes directly.
