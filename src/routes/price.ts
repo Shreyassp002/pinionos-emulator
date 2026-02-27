@@ -15,13 +15,34 @@ router.get('/:token', async (req, res) => {
 
   const priceRule = getPriceRule(token);
   if (priceRule.mode === 'override' && typeof priceRule.value === 'number') {
-    res.json(success({ token, usd: priceRule.value.toFixed(2), source: 'config' }));
+    const usd = priceRule.value.toFixed(2);
+    res.json(
+      success({
+        token,
+        usd,
+        source: 'config',
+        network: 'base',
+        priceUSD: Number(usd),
+        change24h: null,
+        timestamp: new Date().toISOString()
+      })
+    );
     return;
   }
 
   try {
     const usd = await fetchCoinGeckoPrice(token);
-    res.json(success({ token, usd, source: 'coingecko' }));
+    res.json(
+      success({
+        token,
+        usd,
+        source: 'coingecko',
+        network: 'base',
+        priceUSD: Number(usd),
+        change24h: null,
+        timestamp: new Date().toISOString()
+      })
+    );
     return;
   } catch {
     // fall through to binance
@@ -29,7 +50,17 @@ router.get('/:token', async (req, res) => {
 
   try {
     const usd = await fetchBinancePrice(token);
-    res.json(success({ token, usd, source: 'binance' }));
+    res.json(
+      success({
+        token,
+        usd,
+        source: 'binance',
+        network: 'base',
+        priceUSD: Number(usd),
+        change24h: null,
+        timestamp: new Date().toISOString()
+      })
+    );
     return;
   } catch {
     // fall through to final static fallback
@@ -37,7 +68,18 @@ router.get('/:token', async (req, res) => {
 
   const fallbackPrice = getFallbackPrice(token);
   if (fallbackPrice !== null) {
-    res.json(success({ token, usd: fallbackPrice.toFixed(2), source: 'config-fallback' }));
+    const usd = fallbackPrice.toFixed(2);
+    res.json(
+      success({
+        token,
+        usd,
+        source: 'config-fallback',
+        network: 'base',
+        priceUSD: Number(usd),
+        change24h: null,
+        timestamp: new Date().toISOString()
+      })
+    );
     return;
   }
 

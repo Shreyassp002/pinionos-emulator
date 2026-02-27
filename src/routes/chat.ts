@@ -15,14 +15,20 @@ const responses = [
 ];
 
 router.post('/', (req, res) => {
-  const message = String(req.body?.message ?? '');
+  const messages = Array.isArray(req.body?.messages) ? req.body.messages : null;
+  const lastMessageFromHistory =
+    messages && messages.length > 0
+      ? String(messages[messages.length - 1]?.content ?? '')
+      : '';
+  const message = String(req.body?.message ?? lastMessageFromHistory);
+
   if (!message) {
     res.status(400).json(errorResponse('message is required'));
     return;
   }
 
   const idx = message.length % responses.length;
-  res.json(success({ reply: responses[idx], model: 'mock-claude' }));
+  res.json(success({ reply: responses[idx], response: responses[idx], model: 'mock-claude' }));
 });
 
 export default router;

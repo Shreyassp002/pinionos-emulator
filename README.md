@@ -26,13 +26,16 @@ process.env.PINION_API_URL = 'http://localhost:4020';
 - `GET /price/:token`
 - `GET /balance/:address`
 - `GET /wallet`
+- `GET /wallet/generate` (SDK-compatible alias)
 - `GET /tx/:hash`
 - `POST /send`
 - `POST /trade`
 - `GET /fund/:address`
 - `POST /chat`
 - `GET /unlimited`
+- `POST /unlimited` (SDK-compatible alias)
 - `GET /unlimited/verify/:key`
+- `GET /unlimited/verify?key=...` (SDK-compatible alias)
 - `POST /broadcast`
 
 All successful responses follow:

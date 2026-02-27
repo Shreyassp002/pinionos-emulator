@@ -12,7 +12,7 @@ async function run(): Promise<void> {
   console.log(price);
 
   console.log('\n=== STEP 2: BALANCE ===');
-  const balance = await pinion.skills.balance('0x123');
+  const balance = await pinion.skills.balance('0x0000000000000000000000000000000000000123');
   console.log(balance);
 
   console.log('\n=== STEP 3: WALLET ===');

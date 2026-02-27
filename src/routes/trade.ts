@@ -37,6 +37,7 @@ router.post('/', async (req, res) => {
 
     const toAmount = amount * executionPrice * 0.997;
     const minOutputAmount = toAmount * 0.99;
+    const txData = `0x${randomBytes(32).toString('hex')}`;
 
     res.json(
       success({
@@ -50,9 +51,24 @@ router.post('/', async (req, res) => {
         steps: ['price-quote', 'route-selection', 'tx-build'],
         unsignedTx: {
           to: '0xE592427A0AEce92De3Edee1F18E0157C05861564',
-          data: `0x${randomBytes(32).toString('hex')}`,
-          gasLimit: '250000'
+          data: txData,
+          value: '0',
+          gasLimit: '250000',
+          chainId: 8453
         },
+        swap: {
+          to: '0xE592427A0AEce92De3Edee1F18E0157C05861564',
+          data: txData,
+          value: '0',
+          chainId: 8453
+        },
+        srcToken: src,
+        dstToken: dst,
+        amount: amountRaw,
+        network: 'base',
+        router: '0xE592427A0AEce92De3Edee1F18E0157C05861564',
+        note: 'Mock swap route and unsigned transaction.',
+        timestamp: new Date().toISOString(),
         priceImpact: '0.1%',
         executionPrice: executionPrice.toFixed(6)
       })

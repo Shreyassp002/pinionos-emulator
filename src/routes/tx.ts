@@ -20,6 +20,7 @@ router.get('/:hash', (req, res) => {
   res.json(
     success({
       hash,
+      network: 'base',
       from: randomAddress(),
       to: randomAddress(),
       value: '0.01',
@@ -27,7 +28,8 @@ router.get('/:hash', (req, res) => {
       gasUsed: '21000',
       blockNumber,
       status: 'confirmed',
-      timestamp: Math.floor(Date.now() / 1000)
+      timestamp: new Date().toISOString(),
+      timestampUnix: Math.floor(Date.now() / 1000)
     })
   );
 });

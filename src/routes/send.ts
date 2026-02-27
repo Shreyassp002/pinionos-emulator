@@ -30,6 +30,7 @@ router.post('/', (req, res) => {
       const unsignedTx = {
         to,
         value: parseEther(amount).toString(),
+        data: '0x',
         gasLimit: '21000',
         chainId: BASE_CHAIN_ID,
         type: 2
@@ -41,6 +42,16 @@ router.post('/', (req, res) => {
           fromToken: token,
           toAddress: to,
           amount,
+          tx: {
+            to: unsignedTx.to,
+            value: unsignedTx.value,
+            data: unsignedTx.data,
+            chainId: unsignedTx.chainId
+          },
+          token,
+          network: 'base',
+          note: 'Mock unsigned transfer tx. Sign locally before broadcast.',
+          timestamp: new Date().toISOString(),
           estimatedGasFee: '0.0001 ETH',
           status: 'unsigned'
         })
@@ -68,6 +79,16 @@ router.post('/', (req, res) => {
         fromToken: token,
         toAddress: to,
         amount,
+        tx: {
+          to: unsignedTx.to,
+          value: unsignedTx.value,
+          data: unsignedTx.data,
+          chainId: unsignedTx.chainId
+        },
+        token,
+        network: 'base',
+        note: 'Mock unsigned transfer tx. Sign locally before broadcast.',
+        timestamp: new Date().toISOString(),
         estimatedGasFee: '0.0001 ETH',
         status: 'unsigned'
       })

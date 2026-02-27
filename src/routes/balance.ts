@@ -24,7 +24,12 @@ router.get('/:address', (req, res) => {
       address,
       ETH: fromConfig.ETH,
       USDC: fromConfig.USDC,
-      network: 'base'
+      network: 'base',
+      balances: {
+        ETH: fromConfig.ETH,
+        USDC: fromConfig.USDC
+      },
+      timestamp: new Date().toISOString()
     })
   );
 });

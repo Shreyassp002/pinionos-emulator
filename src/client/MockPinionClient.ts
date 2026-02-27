@@ -20,15 +20,19 @@ export class MockPinionClient {
   readonly skills = {
     price: async (token: string): Promise<unknown> => (await this.http.get(`/price/${token}`)).data,
     balance: async (address: string): Promise<unknown> => (await this.http.get(`/balance/${address}`)).data,
-    wallet: async (): Promise<unknown> => (await this.http.get('/wallet')).data,
+    wallet: async (): Promise<unknown> => (await this.http.get('/wallet/generate')).data,
     tx: async (hash: string): Promise<unknown> => (await this.http.get(`/tx/${hash}`)).data,
     fund: async (address: string): Promise<unknown> => (await this.http.get(`/fund/${address}`)).data,
-    chat: async (message: string): Promise<unknown> => (await this.http.post('/chat', { message })).data,
+    chat: async (message: string): Promise<unknown> =>
+      (await this.http.post('/chat', { messages: [{ role: 'user', content: message }] })).data,
     send: async (to: string, amount: string, token: string): Promise<unknown> =>
       (await this.http.post('/send', { to, amount, token })).data,
     trade: async (src: string, dst: string, amount: string): Promise<unknown> =>
       (await this.http.post('/trade', { src, dst, amount })).data,
-    broadcast: async (): Promise<unknown> => (await this.http.post('/broadcast', {})).data,
-    unlimited: async (): Promise<unknown> => (await this.http.get('/unlimited')).data
+    broadcast: async (tx?: { to: string; data?: string; value?: string }): Promise<unknown> =>
+      (await this.http.post('/broadcast', { tx })).data,
+    unlimited: async (): Promise<unknown> => (await this.http.post('/unlimited', {})).data,
+    unlimitedVerify: async (key: string): Promise<unknown> =>
+      (await this.http.get('/unlimited/verify', { params: { key } })).data
   };
 }
