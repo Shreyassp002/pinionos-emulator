@@ -1,0 +1,21 @@
+{
+  "port": 4020,
+  "mockPayments": true,
+  "prices": {
+    "ETH": "useApi:coingecko",
+    "BTC": "useApi:coingecko",
+    "SOL": "useApi:coingecko",
+    "USDC": 1,
+    "MATIC": "useApi:coingecko"
+  },
+  "balances": {
+    "default": {
+      "ETH": "1.5",
+      "USDC": "250.00"
+    },
+    "0x123": {
+      "ETH": "3.2",
+      "USDC": "500.00"
+    }
+  }
+}
