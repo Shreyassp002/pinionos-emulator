@@ -1,21 +1,24 @@
 export interface InspectorState {
   method: string;
   path: string;
+  statusCode?: number;
   body: unknown;
   response: unknown;
 }
 
-function safeJson(value: unknown): string {
+function safeJson(value: unknown, maxLen = 2000): string {
   try {
-    return JSON.stringify(value, null, 2);
+    const s = JSON.stringify(value, null, 2);
+    return s.length > maxLen ? `${s.slice(0, maxLen)}\n  ... (truncated)` : s;
   } catch {
     return String(value);
   }
 }
 
 export function renderInspector(state: InspectorState): string {
-  const reqLine = `${state.method || '-'} ${state.path || '-'}   body: ${safeJson(state.body)}`;
-  const resLine = `→ ${safeJson(state.response)}`;
-  const merged = `${reqLine}\n${resLine}`;
-  return merged.length > 1200 ? `${merged.slice(0, 1200)}...` : merged;
+  const statusTag = state.statusCode ? ` → ${state.statusCode}` : '';
+  const reqLine = `${state.method || '-'} ${state.path || '-'}${statusTag}`;
+  const bodyLine = `body: ${safeJson(state.body, 800)}`;
+  const resLine = `response: ${safeJson(state.response, 1200)}`;
+  return `${reqLine}\n${bodyLine}\n\n${resLine}`;
 }
