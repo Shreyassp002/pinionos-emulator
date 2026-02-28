@@ -182,7 +182,7 @@
     <main class="card" role="main" aria-label="PinionOS Emulator">
       <div class="top">
         <span class="app-name">pinionos-emulator</span>
-        <span class="version">v0.2.0</span>
+        <span class="version" id="versionTag" data-fallback-version="0.2.0">v0.2.0</span>
       </div>
 
       <section class="center">
@@ -215,6 +215,8 @@
     <script>
       const copyBtn = document.getElementById("copyBtn");
       const installCmd = document.getElementById("installCmd");
+      const versionTag = document.getElementById("versionTag");
+      const npmPackage = "@shreyassp002/pinionos-emulator";
 
       copyBtn?.addEventListener("click", async () => {
         const text = installCmd?.textContent?.trim() || "";
@@ -231,6 +233,40 @@
           setTimeout(() => {
             copyBtn.textContent = "Copy";
           }, 1200);
+        }
+      });
+
+      async function readJson(url) {
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`request failed: ${response.status}`);
+        }
+        return response.json();
+      }
+
+      async function resolveVersion() {
+        try {
+          const latest = await readJson(
+            "https://registry.npmjs.org/" + encodeURIComponent(npmPackage) + "/latest"
+          );
+          if (latest && typeof latest.version === "string") {
+            return latest.version;
+          }
+        } catch {}
+
+        try {
+          const localPkg = await readJson("./package.json");
+          if (localPkg && typeof localPkg.version === "string") {
+            return localPkg.version;
+          }
+        } catch {}
+
+        return versionTag?.dataset?.fallbackVersion || "0.0.0";
+      }
+
+      resolveVersion().then((version) => {
+        if (versionTag && version) {
+          versionTag.textContent = `v${version}`;
         }
       });
     </script>
