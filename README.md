@@ -1,19 +1,79 @@
+<div align="center">
+
 # PinionOS Emulator
 
-Local TypeScript emulator for PinionOS skill APIs.
+**Local PinionOS-compatible backend for product development and testing**
 
-Use this to test products built on PinionOS without spending real USDC:
-- your app still calls `client.skills.*`
-- calls are routed to `localhost`
-- responses stay realistic and stable for development/testing
+Test your app with the same `pinion-os` SDK calls, without real USDC spend.
 
-## How Product Teams Use This
+</div>
 
-1. Start the emulator locally.
-2. Point your Pinion client to `http://localhost:4020`.
-3. Run your app and product tests normally.
+## What This Project Is
 
-That is the full loop. Your product code does not need Pinion production while developing.
+`pinion-emulator` is a local server that mirrors Pinion skill APIs so teams can build and test products safely.
+
+Use it when you want to:
+- develop app flows without hitting production
+- run deterministic integration tests in CI
+- exercise x402/unlimited-key paths locally
+- inspect request/response behavior in a terminal dashboard
+
+## Pinion SDK Compatibility
+
+This emulator is designed for `pinion-os` client usage by pointing the SDK to local URL:
+
+```ts
+import { PinionClient } from 'pinion-os';
+
+const client = new PinionClient({
+  privateKey: process.env.PRIVATE_KEY!,
+  apiUrl: 'http://localhost:4020'
+});
+```
+
+## Supported SDK Skills
+
+| Skill | SDK Method | Emulator Endpoint | Status |
+|---|---|---|---|
+| balance | `skills.balance(address)` | `GET /balance/:address` | Supported |
+| tx | `skills.tx(hash)` | `GET /tx/:hash` | Supported |
+| price | `skills.price(token)` | `GET /price/:token` | Supported |
+| wallet | `skills.wallet()` | `GET /wallet/generate` | Supported |
+| chat | `skills.chat(message)` | `POST /chat` | Supported |
+| send | `skills.send(to, amount, token)` | `POST /send` | Supported |
+| trade | `skills.trade(src, dst, amount, slippage)` | `POST /trade` | Supported |
+| fund | `skills.fund(address)` | `GET /fund/:address` | Supported |
+| broadcast | `skills.broadcast(tx)` | `POST /broadcast` | Supported |
+| unlimited | `skills.unlimited()` | `POST /unlimited` | Supported |
+| unlimited-verify | `skills.unlimitedVerify(key)` | `GET /unlimited/verify?key=...` | Supported |
+
+## Supported MCP Tools
+
+Your emulator MCP server currently exposes:
+- `pinion_price`
+- `pinion_balance`
+- `pinion_wallet`
+- `pinion_tx`
+- `pinion_chat`
+- `pinion_send`
+- `pinion_trade`
+- `pinion_fund`
+- `pinion_broadcast`
+- `pinion_unlimited`
+- `pinion_unlimited_verify`
+- `pinion_pay_service`
+- `pinion_facilitator_verify`
+
+## Emulator Features Beyond Core Skills
+
+- x402 middleware mode (`--x402`) with 402 challenge flow
+- unlimited API key issuance and verification
+- generic x402 test service (`/x402/*`)
+- mock facilitator endpoints (`/facilitator/verify`, `/facilitator/status`)
+- request recording (`/recording/start`, `/recording/stop`, `/recording/status`)
+- chaos/error injection via config (`errorSimulation`)
+- mutable in-memory balances + reset (`POST /reset`)
+- terminal dashboard (feed, prices, wallet, inspector)
 
 ## Quick Start
 
@@ -22,68 +82,41 @@ npm install
 npm start
 ```
 
-`npm start` launches the emulator + terminal dashboard.
-
 Health check:
 
 ```bash
-curl http://localhost:4020/health
+curl -s http://localhost:4020/health | jq
 ```
 
-Headless mode (better for CI):
+Headless mode:
 
 ```bash
 npx pinion-emulator --no-dashboard
 ```
 
-## Wire Your App To Emulator
-
-`pinion-os` SDK v0.4.0 requires passing `apiUrl` directly:
-
-```ts
-import { PinionClient } from 'pinion-os';
-
-export const pinion = new PinionClient({
-  privateKey: process.env.PRIVATE_KEY!,
-  apiUrl: 'http://localhost:4020'
-});
-```
-
-Then your existing product code can stay unchanged:
-
-```ts
-const quote = await pinion.skills.trade('ETH', 'USDC', '0.1', 1);
-```
-
-## Example Product Test Flow
-
-For a wallet assistant product, this is a typical integration flow:
-
-1. `skills.wallet()` creates a user wallet.
-2. `skills.fund(address)` prepares mock balance.
-3. `skills.balance(address)` confirms portfolio state.
-4. `skills.trade(...)` builds swap transaction.
-5. `skills.send(...)` builds transfer transaction.
-6. Product UI/API validates and displays those results.
-
-This validates your product behavior end-to-end without real chain activity.
-
-## x402 Testing
-
-Use x402 mode to test payment-gated behavior:
+## CLI Commands
 
 ```bash
-npx pinion-emulator --x402
+pinion-emulator start
+pinion-emulator mcp
+pinion-emulator init
 ```
 
-You can test:
-- `402` responses for unpaid requests
-- unlimited key issue/verify flow
-- protected calls with `X-API-KEY`
+Useful options:
+- `--port <n>`
+- `--x402`
+- `--network base|base-sepolia`
+- `--no-dashboard`
+- `--config <path>`
 
-## CI Recipe
+## Product Testing Workflow
 
-Run emulator in background, execute product tests, stop emulator:
+1. Start emulator locally.
+2. Configure your app's Pinion client with `apiUrl: 'http://localhost:4020'`.
+3. Run your app and test suite.
+4. Assert your product behavior (not just raw route responses).
+
+CI example:
 
 ```bash
 npx pinion-emulator --no-dashboard > /tmp/pinion-emulator.log 2>&1 & EMU_PID=$!
@@ -92,11 +125,12 @@ npm test
 kill $EMU_PID
 ```
 
-## API Coverage
+## Route Summary
 
-Core skill-compatible routes:
+Core routes:
 - `GET /price/:token`
 - `GET /balance/:address`
+- `GET /wallet`
 - `GET /wallet/generate`
 - `GET /tx/:hash`
 - `POST /send`
@@ -104,10 +138,13 @@ Core skill-compatible routes:
 - `GET /fund/:address`
 - `POST /chat`
 - `POST /broadcast`
+- `GET /unlimited`
 - `POST /unlimited`
 - `GET /unlimited/verify?key=...`
+- `GET /unlimited/verify/:key`
 
-Supporting routes:
+System routes:
+- `GET /`
 - `GET /health`
 - `POST /reset`
 - `POST /recording/start`
@@ -117,7 +154,18 @@ Supporting routes:
 - `GET /facilitator/status`
 - `ALL /x402/*`
 
-## More Documentation
+## Notes On Behavior
 
-- Full workflow guide: [user_guide.md](user_guide.md)
-- Project plan/spec docs: `docs/`
+- Responses are mock/simulated with realistic structure.
+- Success envelope includes `mock: true` and payment metadata.
+- Price path uses config override -> CoinGecko -> Binance -> fallback.
+- This is for development/testing, not production settlement.
+
+## Documentation
+
+- Detailed usage and testing guide: [user_guide.md](user_guide.md)
+- Planning/spec docs: [`docs/`](docs)
+
+## License
+
+MIT
