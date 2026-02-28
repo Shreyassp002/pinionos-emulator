@@ -60,7 +60,7 @@ interface GridLayout {
 }
 
 interface ContribModule {
-  grid: new (opts: { rows: number; cols: number; screen: BlessedScreen }) => GridLayout;
+  grid: new (opts: { rows: number; cols: number; screen: BlessedScreen; hideBorder?: boolean }) => GridLayout;
 }
 
 function asContentWidget(value: unknown): { setContent: (content: string) => void } {
@@ -248,14 +248,15 @@ function buildDashboard(port: number): Dashboard {
     const contrib = require('blessed-contrib') as ContribModule;
 
     const screen = blessed.screen({ smartCSR: true, title: 'PinionOS Emulator', fullUnicode: true });
-    const grid = new contrib.grid({ rows: 24, cols: 12, screen });
+    const grid = new contrib.grid({ rows: 24, cols: 12, screen, hideBorder: true });
 
     const header = asContentWidget(
       grid.set(0, 0, 8, 12, blessed.box, {
         tags: true,
-        border: { type: 'line' },
-        style: { border: { fg: 'cyan' } },
-        label: ' {bold}PINION OS EMULATOR{/bold} '
+        align: 'center',
+        valign: 'middle',
+        wrap: false,
+        style: { fg: 'cyan' }
       })
     );
 
