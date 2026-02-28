@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/Shreyassp002/pinionos-emulator/compare/v0.2.1...v0.2.2) (2026-02-28)
+
+
+### Bug Fixes
+
+* load landing page version dynamically from npm ([97c153e](https://github.com/Shreyassp002/pinionos-emulator/commit/97c153e92d821298be044b5a4582ac8d93c8724e))
+
 ## [0.2.1](https://github.com/Shreyassp002/pinionos-emulator/compare/v0.2.0...v0.2.1) (2026-02-28)
 
 
