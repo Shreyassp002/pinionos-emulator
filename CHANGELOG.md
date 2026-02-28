@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/Shreyassp002/pinionos-emulator/compare/v0.1.2...v0.2.0) (2026-02-28)
+
+
+### Features
+
+* add single-page landing site with copyable npm install ([0fa807c](https://github.com/Shreyassp002/pinionos-emulator/commit/0fa807cbcf91f4107cf75b3d69f5e8e2295c86f1))
+
 ## [0.1.2](https://github.com/Shreyassp002/pinionos-emulator/compare/v0.1.1...v0.1.2) (2026-02-28)
 
 
