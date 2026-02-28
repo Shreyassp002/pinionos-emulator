@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logo.jpg" alt="PinionOS Emulator Logo" width="220" />
+<img src="https://github.com/Shreyassp002/pinionos-emulator/blob/main/assets/logo.jpg" alt="PinionOS Emulator Logo" width="220" />
 
 # PinionOS Emulator
 
