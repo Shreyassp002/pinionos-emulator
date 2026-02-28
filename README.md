@@ -10,7 +10,7 @@ Test your app with the same `pinion-os` SDK calls, without real USDC spend.
 
 ## What This Project Is
 
-`pinion-emulator` is a local server that mirrors Pinion skill APIs so teams can build and test products safely.
+`pinionos-emulator` is a local server that mirrors Pinion skill APIs so teams can build and test products safely.
 
 Use it when you want to:
 - develop app flows without hitting production
@@ -91,15 +91,15 @@ curl -s http://localhost:4020/health | jq
 Headless mode:
 
 ```bash
-npx pinion-emulator --no-dashboard
+npx pinionos-emulator --no-dashboard
 ```
 
 ## CLI Commands
 
 ```bash
-pinion-emulator start
-pinion-emulator mcp
-pinion-emulator init
+pinionos-emulator start
+pinionos-emulator mcp
+pinionos-emulator init
 ```
 
 Useful options:
@@ -119,7 +119,7 @@ Useful options:
 CI example:
 
 ```bash
-npx pinion-emulator --no-dashboard > /tmp/pinion-emulator.log 2>&1 & EMU_PID=$!
+npx pinionos-emulator --no-dashboard > /tmp/pinionos-emulator.log 2>&1 & EMU_PID=$!
 sleep 2
 npm test
 kill $EMU_PID

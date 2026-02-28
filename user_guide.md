@@ -27,19 +27,19 @@ This means your real integration points stay intact (`client.skills.*`), but eve
 Install in your project:
 
 ```bash
-npm install --save-dev pinion-emulator
+npm install --save-dev pinionos-emulator
 ```
 
 Start emulator:
 
 ```bash
-npx pinion-emulator
+npx pinionos-emulator
 ```
 
 Headless mode for scripts/CI:
 
 ```bash
-npx pinion-emulator --no-dashboard
+npx pinionos-emulator --no-dashboard
 ```
 
 Health check:
@@ -119,7 +119,7 @@ curl -s -X POST http://localhost:4020/chat \
 Use one command to bring emulator up, run tests, tear down:
 
 ```bash
-npx pinion-emulator --no-dashboard > /tmp/pinion-emulator.log 2>&1 & EMU_PID=$!
+npx pinionos-emulator --no-dashboard > /tmp/pinionos-emulator.log 2>&1 & EMU_PID=$!
 sleep 2
 npm test
 kill $EMU_PID
@@ -136,7 +136,7 @@ Typical assertions in your product tests:
 Start x402 mode:
 
 ```bash
-npx pinion-emulator --x402
+npx pinionos-emulator --x402
 ```
 
 Verify gated behavior:
@@ -232,13 +232,13 @@ System routes:
 Port conflict:
 
 ```bash
-npx pinion-emulator --port 4120
+npx pinionos-emulator --port 4120
 ```
 
 Custom config file:
 
 ```bash
-npx pinion-emulator --config ./config.json
+npx pinionos-emulator --config ./config.json
 ```
 
 If your app still calls production:

@@ -5,10 +5,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const HELP = `
-pinion-emulator — Local PinionOS emulator for agent development
+pinionos-emulator — Local PinionOS emulator for agent development
 
 Usage:
-  pinion-emulator [command] [options]
+  pinionos-emulator [command] [options]
 
 Commands:
   start         Start the emulator (default)
@@ -25,10 +25,10 @@ Options:
   --version, -v     Show version
 
 Examples:
-  pinion-emulator                       # Start with defaults
-  pinion-emulator --port 3000 --x402    # Custom port + x402 mode
-  pinion-emulator init                  # Create config.json
-  npx pinion-emulator                   # Zero-install usage
+  pinionos-emulator                       # Start with defaults
+  pinionos-emulator --port 3000 --x402    # Custom port + x402 mode
+  pinionos-emulator init                  # Create config.json
+  npx pinionos-emulator                   # Zero-install usage
 `.trim();
 
 async function main(): Promise<void> {

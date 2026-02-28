@@ -50,7 +50,7 @@ async function post(path: string, body: Record<string, unknown>): Promise<unknow
 
 async function main(): Promise<void> {
   const server = new McpServer({
-    name: 'pinion-emulator',
+    name: 'pinionos-emulator',
     version: '0.1.0',
     description: 'Local PinionOS emulator — zero-cost mock of all PinionOS skill APIs'
   });

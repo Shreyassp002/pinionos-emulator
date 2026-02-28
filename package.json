@@ -1,10 +1,10 @@
 {
-  "name": "pinion-emulator",
+  "name": "pinionos-emulator",
   "version": "0.1.0",
   "description": "Local PinionOS emulator for free agent development",
   "main": "dist/emulator.js",
   "bin": {
-    "pinion-emulator": "dist/cli.js"
+    "pinionos-emulator": "dist/cli.js"
   },
   "license": "MIT",
   "files": [

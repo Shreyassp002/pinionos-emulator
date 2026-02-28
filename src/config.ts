@@ -140,7 +140,7 @@ export function loadConfig(): Config {
       throw new Error('[PinionOS Emulator] config.json "balances" must include a "default" entry');
     }
   } else {
-    console.log('[PinionOS Emulator] No config.json found, using defaults. Run `pinion-emulator init` to create one.');
+    console.log('[PinionOS Emulator] No config.json found, using defaults. Run `pinionos-emulator init` to create one.');
     cfg = { ...DEFAULT_CONFIG, balances: { ...DEFAULT_CONFIG.balances } };
   }
 
