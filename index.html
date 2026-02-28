@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PinionOS Emulator</title>
+    <style>
+      :root {
+        --bg: #000000;
+        --panel: #0b0b0b;
+        --line: #1c1c1c;
+        --text: #f5f5f5;
+        --muted: #8a8a8a;
+        --soft: #b5b5b5;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular,
+          Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+      }
+
+      .glow {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(
+          700px circle at 50% 45%,
+          rgba(255, 255, 255, 0.09),
+          transparent 58%
+        );
+      }
+
+      .card {
+        width: min(880px, 92vw);
+        height: min(620px, 90dvh);
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, #070707 0%, #030303 100%);
+        border-radius: 18px;
+        padding: 28px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+      }
+
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .version {
+        border: 1px solid #2b2b2b;
+        background: var(--panel);
+        color: var(--soft);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+      }
+
+      .center {
+        display: grid;
+        justify-items: center;
+        text-align: center;
+        gap: 18px;
+      }
+
+      .logo {
+        width: clamp(140px, 24vw, 220px);
+        height: auto;
+        filter: drop-shadow(0 8px 28px rgba(255, 255, 255, 0.08));
+      }
+
+      .desc {
+        margin: 0;
+        line-height: 1.7;
+        color: var(--soft);
+        font-size: clamp(12px, 1.4vw, 14px);
+      }
+
+      .install {
+        max-width: 680px;
+        border: 1px solid #262626;
+        background: #010101;
+        border-radius: 10px;
+        padding: 12px 14px;
+        color: #d4d4d4;
+        font-size: clamp(12px, 1.5vw, 14px);
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .install-wrap {
+        width: 100%;
+        max-width: 680px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: stretch;
+      }
+
+      .copy-btn {
+        border: 1px solid #2a2a2a;
+        background: #0a0a0a;
+        color: #f0f0f0;
+        border-radius: 10px;
+        padding: 0 12px;
+        font-size: 12px;
+        font-family: inherit;
+        cursor: pointer;
+        transition: 160ms ease;
+      }
+
+      .copy-btn:hover {
+        border-color: #4a4a4a;
+        background: #111111;
+      }
+
+      .links {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .links a {
+        text-decoration: none;
+        color: #f0f0f0;
+        border: 1px solid #2a2a2a;
+        background: #0a0a0a;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 12px;
+        transition: 160ms ease;
+      }
+
+      .links a:hover {
+        border-color: #4a4a4a;
+        background: #111111;
+      }
+
+      .footer {
+        color: var(--muted);
+        font-size: 11px;
+        text-align: center;
+      }
+
+      .app-name {
+        color: #9d9d9d;
+        font-size: 10px;
+      }
+
+      @media (max-width: 640px) {
+        .card {
+          height: 92dvh;
+          padding: 20px;
+          border-radius: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow" aria-hidden="true"></div>
+
+    <main class="card" role="main" aria-label="PinionOS Emulator">
+      <div class="top">
+        <span class="app-name">pinionos-emulator</span>
+        <span class="version">v0.1.2</span>
+      </div>
+
+      <section class="center">
+        <img
+          src="assets/black-logo.png"
+          alt="PinionOS Emulator"
+          class="logo"
+        />
+
+        <p class="desc">
+          Test PinionOS wallet, x402, trading, chat, and API flows locally with a
+          deterministic emulator.<br />
+          Build faster with a mock network layer that matches real integration
+          surfaces.
+        </p>
+
+        <div class="install-wrap">
+          <code class="install" id="installCmd">npm install @shreyassp002/pinionos-emulator</code>
+          <button class="copy-btn" id="copyBtn" type="button">Copy</button>
+        </div>
+
+        <nav class="links" aria-label="Project links">
+          <a href="https://github.com/Shreyassp002/pinionos-emulator" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://www.npmjs.com/package/@shreyassp002/pinionos-emulator" target="_blank" rel="noreferrer">npm</a>
+        </nav>
+      </section>
+
+      <div class="footer">Single-page launch panel • no-scroll layout</div>
+    </main>
+    <script>
+      const copyBtn = document.getElementById("copyBtn");
+      const installCmd = document.getElementById("installCmd");
+
+      copyBtn?.addEventListener("click", async () => {
+        const text = installCmd?.textContent?.trim() || "";
+        if (!text) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = "Copied";
+          setTimeout(() => {
+            copyBtn.textContent = "Copy";
+          }, 1200);
+        } catch {
+          copyBtn.textContent = "Failed";
+          setTimeout(() => {
+            copyBtn.textContent = "Copy";
+          }, 1200);
+        }
+      });
+    </script>
+  </body>
+</html>
