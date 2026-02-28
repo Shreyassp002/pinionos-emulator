@@ -79,9 +79,16 @@ Your emulator MCP server currently exposes:
 
 ## Quick Start
 
+Install in your project:
+
 ```bash
-npm install
-npm start
+npm install @shreyassp002/pinionos-emulator
+```
+
+Start emulator (local install):
+
+```bash
+npx pinionos-emulator
 ```
 
 Health check:
@@ -96,13 +103,32 @@ Headless mode:
 npx pinionos-emulator --no-dashboard
 ```
 
+Optional global install:
+
+```bash
+npm install -g @shreyassp002/pinionos-emulator
+pinionos-emulator
+```
+
 ## CLI Commands
+
+Local install (recommended):
+
+```bash
+npx pinionos-emulator start
+npx pinionos-emulator mcp
+npx pinionos-emulator init
+```
+
+Global install:
 
 ```bash
 pinionos-emulator start
 pinionos-emulator mcp
 pinionos-emulator init
 ```
+
+`start` is the default command, so `npx pinionos-emulator` and `pinionos-emulator` are equivalent to `... start`.
 
 Useful options:
 - `--port <n>`
