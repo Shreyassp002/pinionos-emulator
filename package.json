@@ -7,14 +7,22 @@
     "pinion-emulator": "dist/cli.js"
   },
   "license": "MIT",
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "start": "ts-node src/emulator.ts",
+    "start": "ts-node src/cli.ts",
     "dev": "ts-node --watch src/emulator.ts",
     "build": "tsc -p tsconfig.json",
     "build:examples": "tsc -p tsconfig.examples.json",
-    "mcp": "ts-node src/mcp/server.ts",
+    "mcp": "ts-node src/cli.ts mcp",
     "cli": "ts-node src/cli.ts",
-    "test": "echo \"No tests yet\""
+    "prepublishOnly": "npm run build",
+    "test": "node --require ts-node/register --test tests/routes/*.test.ts tests/integration/*.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.0",
@@ -34,6 +42,8 @@
     "@types/express": "^4.17.21",
     "@types/figlet": "^1.7.0",
     "@types/node": "^22.10.2",
+    "@types/supertest": "^7.2.0",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }
