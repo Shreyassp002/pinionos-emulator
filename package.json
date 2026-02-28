@@ -1,5 +1,5 @@
 {
-  "name": "pinionos-emulator",
+  "name": "@shreyassp002/pinionos-emulator",
   "version": "0.1.0",
   "description": "Local PinionOS emulator for free agent development",
   "main": "dist/emulator.js",
