@@ -1,12 +1,19 @@
 # PinionOS Emulator
 
-A local TypeScript emulator for PinionOS skill APIs. Run this server to develop and test agents without real USDC payments — all skill calls are free and return realistic mock data.
+Local TypeScript emulator for PinionOS skill APIs.
 
-## Full User Guide
+Use this to test products built on PinionOS without spending real USDC:
+- your app still calls `client.skills.*`
+- calls are routed to `localhost`
+- responses stay realistic and stable for development/testing
 
-For a complete install + integration + testing workflow, see:
+## How Product Teams Use This
 
-- [docs/user_guide.md](docs/user_guide.md)
+1. Start the emulator locally.
+2. Point your Pinion client to `http://localhost:4020`.
+3. Run your app and product tests normally.
+
+That is the full loop. Your product code does not need Pinion production while developing.
 
 ## Quick Start
 
@@ -15,157 +22,102 @@ npm install
 npm start
 ```
 
+`npm start` launches the emulator + terminal dashboard.
+
 Health check:
 
 ```bash
 curl http://localhost:4020/health
 ```
 
-`npm start` launches the terminal dashboard UI and the emulator server together.
-Press `q` or `Ctrl+C` to exit cleanly.
+Headless mode (better for CI):
 
-## SDK Integration
+```bash
+npx pinion-emulator --no-dashboard
+```
 
-The `pinion-os` SDK v0.4.0 does **not** read `PINION_API_URL` from the environment. You must pass `apiUrl` directly in the constructor:
+## Wire Your App To Emulator
+
+`pinion-os` SDK v0.4.0 requires passing `apiUrl` directly:
 
 ```ts
 import { PinionClient } from 'pinion-os';
 
-const client = new PinionClient({
-  privateKey: '0xYourPrivateKey',
-  apiUrl: 'http://localhost:4020'   // ← required to route to emulator
+export const pinion = new PinionClient({
+  privateKey: process.env.PRIVATE_KEY!,
+  apiUrl: 'http://localhost:4020'
 });
-
-// All skill calls are now free and routed locally
-const price = await client.skills.price('ETH');
-console.log(price.data.priceUSD);
 ```
 
-## MockPinionClient
-
-If you can't use the `PinionClient` constructor directly, use `MockPinionClient` instead. It returns the same `SkillResponse<T>` shape as the real SDK:
+Then your existing product code can stay unchanged:
 
 ```ts
-import { MockPinionClient } from './src/client/MockPinionClient';
-
-const client = new MockPinionClient({ baseUrl: 'http://localhost:4020' });
-
-const price = await client.skills.price('ETH');
-console.log(price.data.priceUSD);  // number
-
-const wallet = await client.skills.wallet();
-console.log(wallet.data.address);  // string
-
-const trade = await client.skills.trade('ETH', 'USDC', '0.5', 1);
-console.log(trade.data.swap);      // UnsignedTx
+const quote = await pinion.skills.trade('ETH', 'USDC', '0.1', 1);
 ```
 
-## Routes
+## Example Product Test Flow
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/price/:token` | USD price for ETH, BTC, SOL, USDC, MATIC |
-| `GET` | `/balance/:address` | ETH + USDC balances |
-| `GET` | `/wallet` | Generate wallet keypair |
-| `GET` | `/wallet/generate` | SDK-compatible alias |
-| `GET` | `/tx/:hash` | Deterministic tx lookup (same hash → same result) |
-| `POST` | `/send` | Build unsigned ETH/ERC-20 transfer tx |
-| `POST` | `/trade` | Build unsigned swap tx via Uniswap V3 |
-| `GET` | `/fund/:address` | Funding instructions for address |
-| `POST` | `/chat` | Chat with mock AI agent |
-| `GET` | `/unlimited` | Issue unlimited API key |
-| `POST` | `/unlimited` | SDK-compatible alias |
-| `GET` | `/unlimited/verify?key=...` | Verify key (flat response, no envelope) |
-| `POST` | `/broadcast` | Simulate broadcast, returns explorer URL |
+For a wallet assistant product, this is a typical integration flow:
 
-### `/send` supported tokens
-`ETH`, `USDC` (6 dec), `WETH` (18 dec), `DAI` (18 dec), `WBTC` (8 dec), `CBETH` (18 dec)
+1. `skills.wallet()` creates a user wallet.
+2. `skills.fund(address)` prepares mock balance.
+3. `skills.balance(address)` confirms portfolio state.
+4. `skills.trade(...)` builds swap transaction.
+5. `skills.send(...)` builds transfer transaction.
+6. Product UI/API validates and displays those results.
 
-### `/trade` notes
-- Uses real prices from CoinGecko → Binance → config fallback
-- Rejects same-token swaps
-- Respects `slippage` parameter (default: 1%)
-- Applies 0.3% Uniswap V3 fee to output
+This validates your product behavior end-to-end without real chain activity.
 
-### Response envelope
+## x402 Testing
 
-All successful responses:
-```json
-{
-  "data": { "...": "..." },
-  "mock": true,
-  "payment": { "amount": "0.01", "token": "USDC", "status": "simulated", "txHash": null }
-}
-```
-Fields from `data` are also spread at the root level for convenience.
-
-Error responses:
-```json
-{ "error": "message", "mock": true }
-```
-
-### Price resolution order
-1. `config.prices` — numeric override or `"useApi:coingecko"` / `"useApi:binance"`
-2. CoinGecko (60s cache)
-3. Binance (60s cache)
-4. `config.fallbackPrices` — static fallback
-
-## config.json
-
-```json
-{
-  "port": 4020,
-  "mockPayments": true,
-  "prices": {
-    "ETH": "useApi:coingecko",
-    "USDC": 1
-  },
-  "fallbackPrices": {
-    "ETH": 3000,
-    "USDC": 1
-  },
-  "balances": {
-    "default": { "ETH": "1.5", "USDC": "250.00" },
-    "0xYourAddress": { "ETH": "3.2", "USDC": "500.00" }
-  }
-}
-```
-
-`config.json` is required at project root. Missing or invalid JSON throws a clear error at startup.
-
-## MCP Mode
-
-Requires the emulator to be running (`npm start`) first.
+Use x402 mode to test payment-gated behavior:
 
 ```bash
-npm run mcp
+npx pinion-emulator --x402
 ```
 
-Claude Desktop:
-```json
-{
-  "mcpServers": {
-    "pinion-emulator": {
-      "command": "npm",
-      "args": ["run", "mcp"],
-      "cwd": "/path/to/pinion-emulator"
-    }
-  }
-}
+You can test:
+- `402` responses for unpaid requests
+- unlimited key issue/verify flow
+- protected calls with `X-API-KEY`
+
+## CI Recipe
+
+Run emulator in background, execute product tests, stop emulator:
+
+```bash
+npx pinion-emulator --no-dashboard > /tmp/pinion-emulator.log 2>&1 & EMU_PID=$!
+sleep 2
+npm test
+kill $EMU_PID
 ```
 
-Available MCP tools: `pinion_price`, `pinion_balance`, `pinion_wallet`, `pinion_tx`, `pinion_chat`, `pinion_send`, `pinion_trade`, `pinion_fund`, `pinion_broadcast`, `pinion_unlimited`, `pinion_unlimited_verify`
+## API Coverage
 
-## Terminal Dashboard
+Core skill-compatible routes:
+- `GET /price/:token`
+- `GET /balance/:address`
+- `GET /wallet/generate`
+- `GET /tx/:hash`
+- `POST /send`
+- `POST /trade`
+- `GET /fund/:address`
+- `POST /chat`
+- `POST /broadcast`
+- `POST /unlimited`
+- `GET /unlimited/verify?key=...`
 
-The dashboard shows live status across 5 panels:
+Supporting routes:
+- `GET /health`
+- `POST /reset`
+- `POST /recording/start`
+- `POST /recording/stop`
+- `GET /recording/status`
+- `POST /facilitator/verify`
+- `GET /facilitator/status`
+- `ALL /x402/*`
 
-| Panel | Content |
-|-------|---------|
-| Header | ASCII banner, server URL, call count, error count, uptime |
-| Live Prices | ETH/BTC/SOL/USDC prices with 24h change arrows (▲/▼) |
-| Mock Wallet | Default ETH/USDC balance, keys issued, address |
-| Skill Call Feed | Every API call: method, route, status code, result, cost |
-| Inspector | Full request/response JSON for the last call |
+## More Documentation
 
-The prices panel auto-refreshes every 30 seconds using a single batched CoinGecko request.
+- Full workflow guide: [user_guide.md](user_guide.md)
+- Project plan/spec docs: `docs/`
