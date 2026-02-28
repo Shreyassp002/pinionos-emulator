@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/logo.jpg" alt="PinionOS Emulator Logo" width="220" />
+
 # PinionOS Emulator
 
 **Local PinionOS-compatible backend for product development and testing**
