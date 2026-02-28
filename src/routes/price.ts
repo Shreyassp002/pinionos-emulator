@@ -1,89 +1,96 @@
 import { Router } from 'express';
 import { fetchBinancePrice } from '../freeApis/binance';
-import { fetchCoinGeckoPrice } from '../freeApis/coingecko';
-import { getFallbackPrice, getPriceRule } from '../config';
+import { fetchCoinGeckoPriceWithChange } from '../freeApis/coingecko';
+import { getFallbackPrice, getNetworkInfo, getPriceRule } from '../config';
+import type { Dashboard } from '../ui/dashboard';
 import { errorResponse, success } from '../types';
 
-const router = Router();
+export function createPriceRouter(dashboard?: Dashboard): Router {
+  const router = Router();
 
-router.get('/:token', async (req, res) => {
-  const token = String(req.params.token || '').toUpperCase();
-  if (!token) {
-    res.status(400).json(errorResponse('token is required'));
-    return;
-  }
+  router.get('/:token', async (req, res) => {
+    const token = String(req.params.token || '').toUpperCase();
+    if (!token) {
+      res.status(400).json(errorResponse('token is required'));
+      return;
+    }
 
-  const priceRule = getPriceRule(token);
-  if (priceRule.mode === 'override' && typeof priceRule.value === 'number') {
-    const usd = priceRule.value.toFixed(2);
-    res.json(
-      success({
-        token,
-        usd,
-        source: 'config',
-        network: 'base',
-        priceUSD: Number(usd),
-        change24h: null,
-        timestamp: new Date().toISOString()
-      })
-    );
-    return;
-  }
+    const net = getNetworkInfo();
 
-  try {
-    const usd = await fetchCoinGeckoPrice(token);
-    res.json(
-      success({
-        token,
-        usd,
-        source: 'coingecko',
-        network: 'base',
-        priceUSD: Number(usd),
-        change24h: null,
-        timestamp: new Date().toISOString()
-      })
-    );
-    return;
-  } catch {
-    // fall through to binance
-  }
+    const priceRule = getPriceRule(token);
+    if (priceRule.mode === 'override' && typeof priceRule.value === 'number') {
+      const usd = priceRule.value.toFixed(2);
+      res.json(
+        success({
+          token,
+          network: net.name,
+          priceUSD: Number(usd),
+          change24h: null,
+          timestamp: new Date().toISOString()
+        })
+      );
+      return;
+    }
 
-  try {
-    const usd = await fetchBinancePrice(token);
-    res.json(
-      success({
-        token,
-        usd,
-        source: 'binance',
-        network: 'base',
-        priceUSD: Number(usd),
-        change24h: null,
-        timestamp: new Date().toISOString()
-      })
-    );
-    return;
-  } catch {
-    // fall through to final static fallback
-  }
+    const providerOrder: Array<'coingecko' | 'binance'> =
+      priceRule.mode === 'api' && priceRule.provider
+        ? [priceRule.provider, priceRule.provider === 'coingecko' ? 'binance' : 'coingecko']
+        : ['coingecko', 'binance'];
 
-  const fallbackPrice = getFallbackPrice(token);
-  if (fallbackPrice !== null) {
-    const usd = fallbackPrice.toFixed(2);
-    res.json(
-      success({
-        token,
-        usd,
-        source: 'config-fallback',
-        network: 'base',
-        priceUSD: Number(usd),
-        change24h: null,
-        timestamp: new Date().toISOString()
-      })
-    );
-    return;
-  }
+    for (const provider of providerOrder) {
+      try {
+        if (provider === 'coingecko') {
+          const { price, change24h } = await fetchCoinGeckoPriceWithChange(token);
+          if (dashboard) {
+            dashboard.updatePrices({ [token]: price });
+          }
+          res.json(
+            success({
+              token,
+              network: net.name,
+              priceUSD: Number(price),
+              change24h: change24h !== null ? `${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%` : null,
+              timestamp: new Date().toISOString()
+            })
+          );
+          return;
+        }
 
-  res.status(502).json(errorResponse(`price unavailable for token: ${token}`));
-});
+        const usd = await fetchBinancePrice(token);
+        res.json(
+          success({
+            token,
+            network: net.name,
+            priceUSD: Number(usd),
+            change24h: null,
+            timestamp: new Date().toISOString()
+          })
+        );
+        return;
+      } catch {
+        // Try next provider in the configured order.
+      }
+    }
 
-export default router;
+    const fallbackPrice = getFallbackPrice(token);
+    if (fallbackPrice !== null) {
+      const usd = fallbackPrice.toFixed(2);
+      res.json(
+        success({
+          token,
+          network: net.name,
+          priceUSD: Number(usd),
+          change24h: null,
+          timestamp: new Date().toISOString()
+        })
+      );
+      return;
+    }
+
+    res.status(404).json(errorResponse(`no price data available for token: ${token}`));
+  });
+
+  return router;
+}
+
+export default createPriceRouter();

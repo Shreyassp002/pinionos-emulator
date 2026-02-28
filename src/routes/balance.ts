@@ -1,6 +1,9 @@
 import { Router } from 'express';
-import { loadConfig } from '../config';
+import { getNetworkInfo } from '../config';
+import { getBalances } from '../state/balances';
 import { errorResponse, success } from '../types';
+
+const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 
 const router = Router();
 
@@ -11,24 +14,19 @@ router.get('/:address', (req, res) => {
     return;
   }
 
-  const config = loadConfig();
-  const fromConfig = config.balances[address] || config.balances.default;
-
-  if (!fromConfig) {
-    res.status(500).json(errorResponse('default balance config missing'));
+  if (!ADDRESS_RE.test(address)) {
+    res.status(400).json(errorResponse('invalid ethereum address'));
     return;
   }
 
+  const balances = getBalances(address);
+
+  const net = getNetworkInfo();
   res.json(
     success({
       address,
-      ETH: fromConfig.ETH,
-      USDC: fromConfig.USDC,
-      network: 'base',
-      balances: {
-        ETH: fromConfig.ETH,
-        USDC: fromConfig.USDC
-      },
+      network: net.name,
+      balances,
       timestamp: new Date().toISOString()
     })
   );

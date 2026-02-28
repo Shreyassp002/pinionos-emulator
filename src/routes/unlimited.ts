@@ -1,9 +1,9 @@
 import { randomBytes } from 'node:crypto';
 import { Router } from 'express';
+import { issuedKeys } from '../middleware/apiKeyStore';
 import { success } from '../types';
 
 const router = Router();
-const issuedKeys = new Map<string, { issuedAt: number; address: string }>();
 
 function issueKeyPayload() {
   const key = `pk_mock_${randomBytes(8).toString('hex')}`;
@@ -12,14 +12,12 @@ function issueKeyPayload() {
   issuedKeys.set(key, { issuedAt, address });
 
   return {
-    key,
-    type: 'unlimited',
-    issuedAt: new Date(issuedAt).toISOString(),
-    expiresAt: null,
     message: 'Unlimited access key issued (simulated)',
     apiKey: key,
     address,
     plan: 'unlimited',
+    price: '$100.00',
+    note: 'Simulated unlimited access — no real USDC charged.',
     timestamp: new Date(issuedAt).toISOString()
   };
 }
@@ -40,9 +38,7 @@ router.get('/verify/:key', (req, res) => {
 
   res.json(
     success({
-      key,
       valid,
-      type: 'unlimited',
       address: entry?.address,
       since: entry ? new Date(entry.issuedAt).toISOString() : undefined,
       plan: entry ? 'unlimited' : undefined

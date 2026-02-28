@@ -1,30 +1,39 @@
 import { Router } from 'express';
 import { Wallet } from 'ethers';
+import { getNetworkInfo } from '../config';
+import type { Dashboard } from '../ui/dashboard';
 import { success } from '../types';
-
-const router = Router();
-const BASE_CHAIN_ID = 8453;
 
 function buildWalletResponse() {
   const wallet = Wallet.createRandom();
+  const net = getNetworkInfo();
   return {
     address: wallet.address,
     privateKey: wallet.privateKey,
-    mnemonic: wallet.mnemonic?.phrase ?? null,
-    network: 'base',
-    chainId: BASE_CHAIN_ID,
-    note: 'Mock wallet generated locally.',
+    network: net.name,
+    chainId: net.chainId,
+    note: 'Mock wallet generated locally. Never use for real funds.',
     timestamp: new Date().toISOString()
   };
 }
 
-router.get('/', (_req, res) => {
-  res.json(success(buildWalletResponse()));
-});
+export function createWalletRouter(dashboard?: Dashboard): Router {
+  const router = Router();
 
-// SDK compatibility: pinion-os currently calls /wallet/generate
-router.get('/generate', (_req, res) => {
-  res.json(success(buildWalletResponse()));
-});
+  function handleWallet(_req: import('express').Request, res: import('express').Response) {
+    const walletData = buildWalletResponse();
+    // Update the dashboard wallet panel with the newly generated address
+    if (dashboard) {
+      dashboard.setWalletInfo({ address: walletData.address });
+    }
+    res.json(success(walletData));
+  }
 
-export default router;
+  router.get('/', handleWallet);
+  // SDK compatibility: pinion-os calls /wallet/generate
+  router.get('/generate', handleWallet);
+
+  return router;
+}
+
+export default createWalletRouter();
