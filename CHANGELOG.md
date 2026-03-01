@@ -1,3 +1,12 @@
+# [0.3.0](https://github.com/Shreyassp002/pinionos-emulator/compare/v0.2.2...v0.3.0) (2026-03-01)
+
+
+### Features
+
+* add /catalog endpoint for skill discovery ([e9575cc](https://github.com/Shreyassp002/pinionos-emulator/commit/e9575cc5c0244f704b062b7e93dca12009448a98))
+* add catalog() to MockPinionClient ([462e6f1](https://github.com/Shreyassp002/pinionos-emulator/commit/462e6f176c1e41d858073c9cdf55967de80c2e64))
+* add pinion_setup, pinion_spend_limit, pinion_catalog MCP tools ([3b32e44](https://github.com/Shreyassp002/pinionos-emulator/commit/3b32e44d9f09373e128db96efd4eed6fa1fbb709))
+
 ## [0.2.2](https://github.com/Shreyassp002/pinionos-emulator/compare/v0.2.1...v0.2.2) (2026-02-28)
 
 
