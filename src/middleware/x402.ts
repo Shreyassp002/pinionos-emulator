@@ -64,7 +64,7 @@ function parsePaymentHeader(header: string): Record<string, unknown> | null {
 }
 
 // Routes that skip x402 (free endpoints, health checks, etc.)
-const SKIP_PATHS = new Set(['/', '/health', '/reset']);
+const SKIP_PATHS = new Set(['/', '/health', '/reset', '/catalog']);
 const SKIP_PREFIXES = ['/unlimited/verify', '/facilitator', '/x402/', '/recording'];
 
 function shouldSkip(path: string, method: string): boolean {

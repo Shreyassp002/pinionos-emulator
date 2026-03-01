@@ -112,6 +112,12 @@ export class MockPinionClient {
     unlimited: (): Promise<SkillResponse<UnlimitedResult>> =>
       this.post<UnlimitedResult>('/unlimited', {}),
 
+    catalog: async (): Promise<SkillResponse<{ skills: Array<{ name: string; path: string; method: string; description: string; price: string; priceToken: string }>; payTo: string; network: string; mock: boolean }>> => {
+      const start = Date.now();
+      const res = await this.http.get('/catalog');
+      return { status: res.status, data: res.data, paidAmount: '0', responseTimeMs: Date.now() - start };
+    },
+
     unlimitedVerify: async (key: string): Promise<UnlimitedVerifyResult> => {
       const res = await this.http.get<UnlimitedVerifyResult>('/unlimited/verify', { params: { key } });
       return res.data;

@@ -15,6 +15,7 @@ import { createSendRouter } from './routes/send';
 import { createTradeRouter } from './routes/trade';
 import { createFacilitatorRouter } from './routes/facilitator';
 import txRouter from './routes/tx';
+import catalogRouter from './routes/catalog';
 import unlimitedRouter from './routes/unlimited';
 import { createX402ServiceRouter } from './routes/x402service';
 import { initBalances, resetBalances } from './state/balances';
@@ -67,6 +68,8 @@ export function createApp(opts: CreateAppOptions = {}) {
 
   app.use(paymentLogger(db));
   app.use(x402Middleware(db));
+
+  app.use('/catalog', catalogRouter);
 
   app.get('/', (_req, res) => {
     res.json({ status: 'ok', emulator: true });
