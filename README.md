@@ -19,6 +19,14 @@ Your app code  -->  pinion-os SDK  -->  PinionOS Emulator (localhost:4020)  --> 
 ```
 
 Your app code does not change. You only swap the URL.
+<br><br>
+
+<img 
+  src="https://github.com/user-attachments/assets/06f8feba-eedf-4b5f-b305-92b528ac2f29" 
+  alt="PinionOS Emulator Banner" 
+  width="100%" 
+/>
+
 
 ## Quick Start
 
